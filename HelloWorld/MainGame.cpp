@@ -5,7 +5,7 @@
 int DISPLAY_WIDTH = 1280;
 int DISPLAY_HEIGHT = 720;
 int DISPLAY_SCALE = 1;
-int seq[30]{};
+const int ARRAY_SIZE = 30;
 int H = 200;
 int MARGIN = 10;
 Point2D S_MID = { DISPLAY_WIDTH / 2, DISPLAY_HEIGHT / 2 + 25 };
@@ -41,12 +41,14 @@ void modifyStructValues(Sqr& s, Point2D topLeft, Play::Colour c, bool fillWithCo
 
 void SetSequence();
 void HandlePlayerControls();
+void SetSequence(int arr[], int size);
 void CreateSqrs();
 //void UpdateSqrs();
 
 // The entry point for a PlayBuffer program
 void MainGameEntry( PLAY_IGNORE_COMMAND_LINE ) {
-    SetSequence();
+    int arr[ARRAY_SIZE];
+    SetSequence(arr, ARRAY_SIZE);
 	Play::CreateManager( DISPLAY_WIDTH, DISPLAY_HEIGHT, DISPLAY_SCALE );
 	Play::StartAudioLoop("music");
 }
@@ -59,16 +61,18 @@ bool MainGameUpdate( float elapsedTime ) {
         { DISPLAY_WIDTH / 2, DISPLAY_HEIGHT - 60 }, Play::CENTRE);
     Play::DrawFontText("132px", "SCORE: " + std::to_string(gameState.score),
         { DISPLAY_WIDTH / 2, 30 }, Play::CENTRE);
+    HandlePlayerControls();
 	Play::PresentDrawingBuffer();
 	return Play::KeyDown( VK_ESCAPE );
 }
 
 void HandlePlayerControls() {
-    if (Play::GetMouseButton(Play::LEFT)) {
+    if (Play::KeyPressed( VK_LBUTTON )) {
         Point2D mousePos = Play::GetMousePos();
+        gameState.score++;
     }
     if (Play::KeyPressed(VK_SPACE)) {
-    //RESTART GAME
+        gameState.score = 0;
     }
 }
 
@@ -78,9 +82,9 @@ int MainGameExit( void ) {
 	return PLAY_OK;
 }
 
-void SetSequence() {
-    for (int i = 0; i < 30; i++) {
-        seq[i] = Play::RandomRollRange(0, 3);
+void SetSequence(int arr[], int size) {
+    for (int i = 0; i < size; i++) {
+        arr[i] = Play::RandomRollRange(0, 3);
     }
 }
 
