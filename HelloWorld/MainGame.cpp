@@ -69,6 +69,7 @@ bool MainGameUpdate( float elapsedTime ) {
 	return Play::KeyDown( VK_ESCAPE );
 }
 
+// I guess that we can assign our 4 squares to sprites and after check if the sprite was clicked or not
 void HandlePlayerControls() {
     if (Play::KeyPressed( VK_LBUTTON )) {
         gameState.curr++;
@@ -76,28 +77,31 @@ void HandlePlayerControls() {
         if (mousePos.x >= sqrR.tl.x && mousePos.x <= sqrR.br.x && mousePos.y >= sqrR.tl.y && mousePos.y <= sqrR.br.y) {
             //red
             gameState.pressed = 0;
-            Play::DrawDebugText({ 100,100 }, "RED", Play::cWhite, true);
+            //Play::DrawDebugText({ 100,100 }, "RED", Play::cWhite, true);
         }
         else if (mousePos.x >= sqrY.tl.x && mousePos.x <= sqrY.br.x && mousePos.y >= sqrY.tl.y && mousePos.y <= sqrY.br.y) {
             //yellow
             gameState.pressed = 1;
-            Play::DrawDebugText({ 100,100 }, "YELLOW", Play::cWhite, true);
+            //Play::DrawDebugText({ 100,100 }, "YELLOW", Play::cWhite, true);
         }
         else if (mousePos.x >= sqrB.tl.x && mousePos.x <= sqrB.br.x && mousePos.y >= sqrB.tl.y && mousePos.y <= sqrB.br.y) {
             //blue
             gameState.pressed = 2;
-            Play::DrawDebugText({ 100,100 }, "BLUE", Play::cWhite, true);
+            //Play::DrawDebugText({ 100,100 }, "BLUE", Play::cWhite, true);
         }
         else if (mousePos.x >= sqrG.tl.x && mousePos.x <= sqrG.br.x && mousePos.y >= sqrG.tl.y && mousePos.y <= sqrG.br.y) {
             //green
             gameState.pressed = 3;
-            Play::DrawDebugText({ 100,100 }, "GREEN", Play::cWhite, true);
+            //Play::DrawDebugText({ 100,100 }, "GREEN", Play::cWhite, true);
         }
         if (CheckOnPress())
             gameState.score++;
+        else
+            gameState.score = 0;
     }
-    if (Play::KeyPressed(VK_SPACE)) {
-        gameState.score = 0;
+    if (Play::KeyPressed( VK_SPACE )) {
+        //ShowSeq();
+        gameState.score = 888;
     }
 }
 
