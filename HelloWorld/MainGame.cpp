@@ -5,6 +5,10 @@
 int DISPLAY_WIDTH = 1280;
 int DISPLAY_HEIGHT = 720;
 int DISPLAY_SCALE = 1;
+int seq[30]{};
+int H = 200;
+int MARGIN = 10;
+Point2D S_MID = { DISPLAY_WIDTH / 2, DISPLAY_HEIGHT / 2 + 25 };
 
 enum Colors {
     RED = 0,
@@ -16,34 +20,45 @@ enum Colors {
 struct GameState {
 	int score = 0;
     Colors colors = RED;
+    int max = 4;
 };
-
 GameState gameState;
 
+struct Sqr {
+    Point2D tl = { S_MID.x - MARGIN - H, S_MID.y - MARGIN - H };
+    Point2D br = { tl.x + H, tl.y + H };
+    Play::Colour pix = Play::cRed;
+    bool fill = true;
+};
+Sqr sqrR, sqrY, sqrB, sqrG;
+
+void modifyStructValues(Sqr& s, Point2D topLeft, Play::Colour c, bool fillWithColor) {
+    s.tl = topLeft;
+    s.br = { topLeft.x + H, topLeft.y + H };
+    s.pix = c;
+    s.fill = fillWithColor;
+}
+
+void SetSequence();
 void HandlePlayerControls();
-void UpdateSqrs();
-void UpdateCircles();
+void CreateSqrs();
+//void UpdateSqrs();
 
 // The entry point for a PlayBuffer program
 void MainGameEntry( PLAY_IGNORE_COMMAND_LINE ) {
+    SetSequence();
 	Play::CreateManager( DISPLAY_WIDTH, DISPLAY_HEIGHT, DISPLAY_SCALE );
-	Play::CentreAllSpriteOrigins();
 	Play::StartAudioLoop("music");
-	//Play::CreateGameObject(TYPE_AGENT8, { 115, 0 }, 50, "agent8");
-    //int id_fan = Play::CreateGameObject(TYPE_FAN, { 1140, 217 }, 0, "fan");
-    //Play::GetGameObject(id_fan).velocity = { 0, 3 };
-    //Play::GetGameObject(id_fan).animSpeed = 1.0f;
 }
 
 // Called by PlayBuffer every frame (60 times a second!)
 bool MainGameUpdate( float elapsedTime ) {
     Play::ClearDrawingBuffer(Play::cBlack);
-    UpdateSqrs();
-    UpdateCircles();
+    CreateSqrs();
     Play::DrawFontText("64px", "REMEMBER THE COLOURS ORDER. REPEAT THE SEQUENCE BY CLICKING ON THE SQUARES",
-        { DISPLAY_WIDTH / 2, DISPLAY_HEIGHT - 30 }, Play::CENTRE);
+        { DISPLAY_WIDTH / 2, DISPLAY_HEIGHT - 60 }, Play::CENTRE);
     Play::DrawFontText("132px", "SCORE: " + std::to_string(gameState.score),
-        { DISPLAY_WIDTH / 2, 50 }, Play::CENTRE);
+        { DISPLAY_WIDTH / 2, 30 }, Play::CENTRE);
 	Play::PresentDrawingBuffer();
 	return Play::KeyDown( VK_ESCAPE );
 }
@@ -63,26 +78,27 @@ int MainGameExit( void ) {
 	return PLAY_OK;
 }
 
-Point2D getBottomRight(Point2D topLeft, int length) {
-    return { topLeft.x + length, topLeft.y + length };
+void SetSequence() {
+    for (int i = 0; i < 30; i++) {
+        seq[i] = Play::RandomRollRange(0, 3);
+    }
 }
 
-void UpdateSqrs() {
-    int margin = 10;
-    int h = 200;
-    Point2D mid = { DISPLAY_WIDTH / 2, DISPLAY_HEIGHT / 2 };
-    
-    Point2D red = {mid.x - margin - h, mid.y - margin - h};
-    Point2D yellow = { mid.x + margin, mid.y - margin - h };
-    Point2D blue = { mid.x - margin - h, mid.y + margin };
-    Point2D green = { mid.x + margin, mid.y + margin };
-    
-    Play::DrawRect(red, getBottomRight(red, h), Play::cRed, true);
-    Play::DrawRect(yellow, getBottomRight(yellow, h), Play::cYellow, true);
-    Play::DrawRect(blue, getBottomRight(blue, h), Play::cBlue, true);
-    Play::DrawRect(green, getBottomRight(green, h), Play::cGreen, true);
+void CreateSqrs() {
+    Point2D redP = { S_MID.x - MARGIN - H, S_MID.y - MARGIN - H };
+    Point2D yellowP = { S_MID.x + MARGIN, S_MID.y - MARGIN - H };
+    Point2D blueP = { S_MID.x - MARGIN - H, S_MID.y + MARGIN };
+    Point2D greenP = { S_MID.x + MARGIN, S_MID.y + MARGIN };
+
+    modifyStructValues(sqrR, redP, Play::cRed, true);
+    modifyStructValues(sqrY, yellowP, Play::cYellow, true);
+    modifyStructValues(sqrB, blueP, Play::cBlue, true);
+    modifyStructValues(sqrG, greenP, Play::cGreen, true);
+
+    Play::DrawRect(sqrR.tl, sqrR.br, sqrR.pix, sqrR.fill);
+    Play::DrawRect(sqrY.tl, sqrY.br, sqrY.pix, sqrY.fill);
+    Play::DrawRect(sqrB.tl, sqrB.br, sqrB.pix, sqrB.fill);
+    Play::DrawRect(sqrG.tl, sqrG.br, sqrG.pix, sqrG.fill);
 }
 
-void UpdateCircles() {
 
-}
