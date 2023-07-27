@@ -1,11 +1,11 @@
-#define PLAY_IMPLEMENTATION
+﻿#define PLAY_IMPLEMENTATION
 #define PLAY_USING_GAMEOBJECT_MANAGER
 #include "Play.h"
 
 int DISPLAY_WIDTH = 1280;
 int DISPLAY_HEIGHT = 720;
 int DISPLAY_SCALE = 1;
-const int ARRAY_SIZE = 30;
+const int ARRAY_SIZE = 10;
 int H = 200;
 int MARGIN = 10;
 Point2D S_MID = { DISPLAY_WIDTH / 2, DISPLAY_HEIGHT / 2 + 25 };
@@ -56,14 +56,19 @@ void MainGameEntry( PLAY_IGNORE_COMMAND_LINE ) {
 }
 
 // Called by PlayBuffer every frame (60 times a second!)
-bool MainGameUpdate( float elapsedTime ) {
+bool MainGameUpdate(float elapsedTime) {
     Play::ClearDrawingBuffer(Play::cBlack);
     CreateSqrs();
     CheckOnPress();
-    Play::DrawFontText("64px", "REMEMBER THE COLOURS ORDER. REPEAT THE SEQUENCE BY CLICKING ON THE SQUARES",
+    Play::DrawFontText("64px", "TRY TO GUESS THE SEQUENCE. REPEAT IT BY CLICKING ON THE SQUARES",
         { DISPLAY_WIDTH / 2, DISPLAY_HEIGHT - 60 }, Play::CENTRE);
-    Play::DrawFontText("132px", "SCORE: " + std::to_string(gameState.score),
+    if (gameState.curr == ARRAY_SIZE) {
+        Play::DrawFontText("132px", "YOU DID IT!!!",
+            { DISPLAY_WIDTH / 2, 30 }, Play::CENTRE);
+    } else {
+        Play::DrawFontText("132px", "SCORE: " + std::to_string(gameState.score),
         { DISPLAY_WIDTH / 2, 30 }, Play::CENTRE);
+    }
     HandlePlayerControls();
 	Play::PresentDrawingBuffer();
 	return Play::KeyDown( VK_ESCAPE );
@@ -94,10 +99,12 @@ void HandlePlayerControls() {
             gameState.pressed = 3;
             //Play::DrawDebugText({ 100,100 }, "GREEN", Play::cWhite, true);
         }
-        if (CheckOnPress())
+        if (CheckOnPress()) {
             gameState.score++;
-        else
+        } else {
             gameState.score = 0;
+            gameState.curr = 0;
+        }
     }
     if (Play::KeyPressed( VK_SPACE )) {
         //ShowSeq();
