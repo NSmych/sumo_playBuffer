@@ -21,6 +21,9 @@ struct GameState {
 	int score = 0;
     Colors colors = RED;
     int max = 4;
+    int curr = 0;
+    int arr[ARRAY_SIZE];
+    int pressed = 0;
 };
 GameState gameState;
 
@@ -43,12 +46,11 @@ void SetSequence();
 void HandlePlayerControls();
 void SetSequence(int arr[], int size);
 void CreateSqrs();
-//void UpdateSqrs();
+bool CheckOnPress();
 
 // The entry point for a PlayBuffer program
 void MainGameEntry( PLAY_IGNORE_COMMAND_LINE ) {
-    int arr[ARRAY_SIZE];
-    SetSequence(arr, ARRAY_SIZE);
+    SetSequence(gameState.arr, ARRAY_SIZE);
 	Play::CreateManager( DISPLAY_WIDTH, DISPLAY_HEIGHT, DISPLAY_SCALE );
 	Play::StartAudioLoop("music");
 }
@@ -57,6 +59,7 @@ void MainGameEntry( PLAY_IGNORE_COMMAND_LINE ) {
 bool MainGameUpdate( float elapsedTime ) {
     Play::ClearDrawingBuffer(Play::cBlack);
     CreateSqrs();
+    CheckOnPress();
     Play::DrawFontText("64px", "REMEMBER THE COLOURS ORDER. REPEAT THE SEQUENCE BY CLICKING ON THE SQUARES",
         { DISPLAY_WIDTH / 2, DISPLAY_HEIGHT - 60 }, Play::CENTRE);
     Play::DrawFontText("132px", "SCORE: " + std::to_string(gameState.score),
@@ -68,8 +71,30 @@ bool MainGameUpdate( float elapsedTime ) {
 
 void HandlePlayerControls() {
     if (Play::KeyPressed( VK_LBUTTON )) {
+        gameState.curr++;
         Point2D mousePos = Play::GetMousePos();
-        gameState.score++;
+        if (mousePos.x >= sqrR.tl.x && mousePos.x <= sqrR.br.x && mousePos.y >= sqrR.tl.y && mousePos.y <= sqrR.br.y) {
+            //red
+            gameState.pressed = 0;
+            Play::DrawDebugText({ 100,100 }, "RED", Play::cWhite, true);
+        }
+        else if (mousePos.x >= sqrY.tl.x && mousePos.x <= sqrY.br.x && mousePos.y >= sqrY.tl.y && mousePos.y <= sqrY.br.y) {
+            //yellow
+            gameState.pressed = 1;
+            Play::DrawDebugText({ 100,100 }, "YELLOW", Play::cWhite, true);
+        }
+        else if (mousePos.x >= sqrB.tl.x && mousePos.x <= sqrB.br.x && mousePos.y >= sqrB.tl.y && mousePos.y <= sqrB.br.y) {
+            //blue
+            gameState.pressed = 2;
+            Play::DrawDebugText({ 100,100 }, "BLUE", Play::cWhite, true);
+        }
+        else if (mousePos.x >= sqrG.tl.x && mousePos.x <= sqrG.br.x && mousePos.y >= sqrG.tl.y && mousePos.y <= sqrG.br.y) {
+            //green
+            gameState.pressed = 3;
+            Play::DrawDebugText({ 100,100 }, "GREEN", Play::cWhite, true);
+        }
+        if (CheckOnPress())
+            gameState.score++;
     }
     if (Play::KeyPressed(VK_SPACE)) {
         gameState.score = 0;
@@ -105,4 +130,11 @@ void CreateSqrs() {
     Play::DrawRect(sqrG.tl, sqrG.br, sqrG.pix, sqrG.fill);
 }
 
-
+bool CheckOnPress() {
+    if (gameState.arr[gameState.curr] == gameState.pressed) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
